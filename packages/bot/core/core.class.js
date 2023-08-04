@@ -343,5 +343,28 @@ class CoreClass {
         }
         return Promise.all(queue)
     }
+
+    set setFlowClass (flowClass) {
+        this.flowClass = flowClass;
+        this.updateListeners();
+    };
+
+    // Actualiza la información de los listeners al cambiar la clase de flujo
+    updateListeners = () => {
+        const listeners = this.listenerBusEvents(); // Obtiene los listeners actuales
+        this.providerClass.removeAllListeners(); // Elimina todos los listeners existentes
+
+        for (const listener of listeners) {
+            const { event, func } = listener;
+            if (this.isValidEvent(event)) {
+                this.providerClass.on(event, func);
+            }
+        }
+    };
+
+    isValidEvent = (event) => {
+        return event === 'preinit' || event === 'require_action' || event === 'ready' ||
+               event === 'auth_failure' || event === 'message' || event === 'notice';
+    };
 }
 module.exports = CoreClass
